@@ -5,7 +5,7 @@ const REPOS = new Set([
     "fluent-rs",
 ]);
 const START_DATE = new Date(2018, 6);
-var data = null, date_data = [];
+var data = null, date_data = [], chart;
 async function load_data() {
     let all_data = (
         await fetch("fluent-stars-result.json").then(r => r.json())
@@ -31,7 +31,7 @@ function transform() {
 function render() {
     let ctx = document.getElementById("graph").getContext('2d');
     let maxdate = Math.max(date_data[date_data.length-1].date, new Date(2019, 3));
-    let chart = new Chart(ctx, {
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
@@ -54,6 +54,16 @@ function render() {
                         suggestedMax: 1000,
                     },
                 }],
+            },
+            plugins: {
+                zoom: {
+                    zoom: {
+                        enabled: true,
+                        drag: true,
+                        mode: 'x',
+                        speed: 0.05
+                    }
+                }
             }
         },
     });
@@ -63,5 +73,9 @@ async function boot() {
     await load_data();
     date_data = transform();
     render();
+}
+
+function resetZoom() {
+  chart.resetZoom();
 }
 boot();
